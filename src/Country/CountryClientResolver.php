@@ -17,12 +17,6 @@ final class CountryClientResolver implements CountryResolverInterface
 
     public function getCountryAlpha2(string $firstCardDigits): string
     {
-        $result = $this->binlistClient->getCardInfo($firstCardDigits);
-        $alpha2 = $result['country']['alpha2'] ?? null;
-        if (null == $alpha2) {
-            throw new \RuntimeException('Failed resolve country alpha2 by card digits');
-        }
-
-        return $alpha2;
+        return $this->binlistClient->getCardInfo($firstCardDigits)->getCountryAlpha2();
     }
 }

@@ -6,6 +6,7 @@ namespace App\Client\Binlist\Factory;
 
 use App\Client\Binlist\BinlistApiClient;
 use App\Client\Binlist\BinlistClientInterface;
+use App\Client\Binlist\Response\Factory\CardInfoResponseFactory;
 use Symfony\Component\HttpClient\HttpClient;
 
 class BinlistClientFactory
@@ -19,6 +20,6 @@ class BinlistClientFactory
             );
         }
 
-        return new BinlistApiClient($baseUrl, HttpClient::create());
+        return new BinlistApiClient($baseUrl, HttpClient::create(), new CardInfoResponseFactory());
     }
 }

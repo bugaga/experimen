@@ -24,9 +24,8 @@ final class CurrencyClientConvertor implements CurrencyConvertorInterface
             return $amount;
         }
 
-        $response = $this->client->getRates();
-        $rate = (float) ($response['rates'][$baseCurrency] ?? 0);
-        if (0 >= $rate) {
+        $rate = $this->client->getRates()->getRateForCurrency($baseCurrency);
+        if (null === $rate || 0 >= $rate) {
             return $amount;
         }
 

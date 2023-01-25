@@ -6,8 +6,10 @@ namespace Test\App;
 
 use App\Client\Binlist\BinlistClientInterface;
 use App\Client\Binlist\Factory\BinlistClientFactory;
+use App\Client\Binlist\Response\CardInfoResponse;
 use App\Client\Exchangerates\ExchangeratesClientInterface;
 use App\Client\Exchangerates\Factory\ExchangeratesClientFactory;
+use App\Client\Exchangerates\Response\RatesResponse;
 use App\Transaction\AmountDTO;
 use App\Transaction\Provider\TransactionProviderInterface;
 use App\Transaction\Transaction;
@@ -25,13 +27,7 @@ final class ApplicationTest extends \PHPUnit\Framework\TestCase
         $exchangeratesClient = $this->createStub(ExchangeratesClientInterface::class);
         $exchangeratesClient
             ->method('getRates')
-            ->willReturn(
-                [
-                    'rates' => [
-                        'UAH' => 40.5,
-                    ],
-                ]
-            );
+            ->willReturn(new RatesResponse(['UAH' => 40.5]));
         $exchangeratesClientFactory = $this->createStub(ExchangeratesClientFactory::class);
         $exchangeratesClientFactory->method('createClient')->willReturn($exchangeratesClient);
 
@@ -40,8 +36,8 @@ final class ApplicationTest extends \PHPUnit\Framework\TestCase
             ->method('getCardInfo')
             ->willReturnMap(
                 [
-                    ['12345', ['country' => ['alpha2' => 'UA']]],
-                    ['09876', ['country' => ['alpha2' => 'FR']]],
+                    ['12345', new CardInfoResponse('UA')],
+                    ['09876', new CardInfoResponse('FR')],
                 ]
             );
         $binlistClientFactory = $this->createStub(BinlistClientFactory::class);

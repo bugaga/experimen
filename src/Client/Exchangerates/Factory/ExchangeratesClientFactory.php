@@ -6,6 +6,7 @@ namespace App\Client\Exchangerates\Factory;
 
 use App\Client\Exchangerates\ExchangeratesApiClient;
 use App\Client\Exchangerates\ExchangeratesClientInterface;
+use App\Client\Exchangerates\Response\Factory\ExchangeratesResponseFactory;
 use Symfony\Component\HttpClient\HttpClient;
 
 class ExchangeratesClientFactory
@@ -19,6 +20,6 @@ class ExchangeratesClientFactory
             );
         }
 
-        return new ExchangeratesApiClient($baseUrl, HttpClient::create());
+        return new ExchangeratesApiClient($baseUrl, HttpClient::create(), new ExchangeratesResponseFactory());
     }
 }
