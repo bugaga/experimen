@@ -16,9 +16,11 @@ final class ApplicationTest extends \PHPUnit\Framework\TestCase
 {
     public function testSuccessful(): void
     {
-        $transaction = new Transaction('12345', new AmountDTO(100.0), 'UAH');
+        $transaction1 = new Transaction('12345', new AmountDTO(100.0), 'UAH');
+        $transaction2 = new Transaction('09876', new AmountDTO(32.8), 'EUR');
+
         $transactionProvider = $this->createStub(TransactionProviderInterface::class);
-        $transactionProvider->method('getTransactions')->willReturn([$transaction]);
+        $transactionProvider->method('getTransactions')->willReturn([$transaction1, $transaction2]);
 
         $exchangeratesClient = $this->createStub(ExchangeratesClientInterface::class);
         $exchangeratesClient
@@ -36,8 +38,12 @@ final class ApplicationTest extends \PHPUnit\Framework\TestCase
         $binlistClient = $this->createStub(BinlistClientInterface::class);
         $binlistClient
             ->method('getCardInfo')
-            ->with('12345')
-            ->willReturn(['country' => ['alpha2' => 'UA']]);
+            ->willReturnMap(
+                [
+                    ['12345', ['country' => ['alpha2' => 'UA']]],
+                    ['09876', ['country' => ['alpha2' => 'FR']]],
+                ]
+            );
         $binlistClientFactory = $this->createStub(BinlistClientFactory::class);
         $binlistClientFactory->method('createClient')->willReturn($binlistClient);
 
@@ -48,10 +54,15 @@ final class ApplicationTest extends \PHPUnit\Framework\TestCase
         );
         $applicateion->run();
 
-        $expectedFinalAmount = new AmountDTO((100 / 40.5) * 0.02);
+        $expectedFinalAmountUah = new AmountDTO((100 / 40.5) * 0.02);
+        $expectedFinalAmountEur = new AmountDTO(32.8 * 0.01);
 
-        $this->expectOutputString(
-            sprintf('Final amount of transaction for card "%s" is %s', '12345', $expectedFinalAmount)
-        );
+        $expectedOutput = <<<OUTPUT
+Final amount of transaction for card "12345" is %s
+Final amount of transaction for card "09876" is %s
+
+OUTPUT;
+
+        $this->expectOutputString(sprintf($expectedOutput, $expectedFinalAmountUah, $expectedFinalAmountEur));
     }
 }

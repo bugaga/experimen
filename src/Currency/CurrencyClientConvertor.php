@@ -25,10 +25,6 @@ final class CurrencyClientConvertor implements CurrencyConvertorInterface
         }
 
         $response = $this->client->getRates();
-        if (false === array_key_exists($baseCurrency, $response['rates'] ?? [])) {
-//            throw new \RuntimeException(sprintf('There is no rate for currency "%s".', $baseCurrency));
-        }
-
         $rate = (float) ($response['rates'][$baseCurrency] ?? 0);
         if (0 >= $rate) {
             return $amount;
